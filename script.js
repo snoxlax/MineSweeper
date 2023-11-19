@@ -2,17 +2,17 @@ const restartButton = document.getElementById('RestartButton');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const resolution = 100;
-canvas.width = 1600;
-canvas.height = 1600;
+canvas.width = 1000;
+canvas.height = 2000;
 const cols = canvas.width / resolution;
 const rows = canvas.height / resolution;
-const mines = 40;
+const mines = 30;
 
 // // Create 2D array
-let mainGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
+let mainGrid = Array(cols).fill().map(() => Array(rows).fill(0));
 
 restartButton.addEventListener('click', function () {
-    mainGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
+    mainGrid = Array(cols).fill().map(() => Array(rows).fill(0));
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     creatMineArray(rows, cols)
     updateGrid()
@@ -131,26 +131,9 @@ const creatMineArray = (rows, cols) => {
     console.log("Mines added");
 };
 
-const revealGrid = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-            const x = i * resolution;
-            const y = j * resolution;
-            if (mainGrid[i][j] === 10) {
-                drawMine(x, y);
-            }
-            else if (mainGrid[i][j] !== 0) {
-                drawNumber(mainGrid[i][j], x, y)
-            }
-            ctx.strokeStyle = 'black';
-            ctx.strokeRect(x, y, resolution, resolution);
-        }
-    }
-}
+
 
 const updateGrid = () => {
-    const newGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
             const cell = mainGrid[i][j];
@@ -205,9 +188,33 @@ drawMine = (posx, posy) => {
     };
 }
 
+const revealGrid = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    console.log(cols, rows);
+    console.log(mainGrid);
+    for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+            const x = i * resolution;
+            const y = j * resolution;
+            if (mainGrid[i][j] === 10) {
+                drawMine(x, y);
+            }
+            else if (mainGrid[i][j] !== 0) {
+                drawNumber(mainGrid[i][j], x, y)
+            } else {
+                drawNumber(mainGrid[i][j], x, y)
+            }
+            ctx.strokeStyle = 'black';
+            ctx.strokeRect(x, y, resolution, resolution);
+        }
+    }
+}
+
 
 window.onload = function () {
+
     creatMineArray(rows, cols)
-    updateGrid()
     fillGrid()
+    updateGrid()
+    //revealGrid()
 };
