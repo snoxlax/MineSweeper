@@ -2,11 +2,11 @@ const restartButton = document.getElementById('RestartButton');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const resolution = 100;
-canvas.width = 1000;
+canvas.width = 1500;
 canvas.height = 2000;
 const cols = canvas.width / resolution;
 const rows = canvas.height / resolution;
-const mines = 30;
+const mines = 50;
 
 // // Create 2D array
 let mainGrid = Array(cols).fill().map(() => Array(rows).fill(0));
@@ -126,7 +126,8 @@ const creatMineArray = (rows, cols) => {
         let x = Math.floor(Math.random() * (cols));
         let y = Math.floor(Math.random() * (rows));
         console.log(x, y);
-        mainGrid[x][y] = 10;
+        if (mainGrid[x][y] != 10)
+            mainGrid[x][y] = 10;
     }
     console.log("Mines added");
 };
