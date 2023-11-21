@@ -8,7 +8,7 @@ const cols = canvas.width / resolution;
 const rows = canvas.height / resolution;
 const mines = 88;
 
-// // Create 2D array
+// Create 2D array
 let mainGrid = Array(cols).fill().map(() => Array(rows).fill(0));
 
 restartButton.addEventListener('click', function () {
@@ -39,11 +39,6 @@ const mouseClick = (event) => {
 
 canvas.addEventListener('click', mouseClick);
 
-const revealSquare = (x, y) => {
-    if (mainGrid[x][y] === 0) {
-        revealEmpty(x, y)
-    }
-}
 
 const revealEmpty = (x, y) => {
     mainGrid[x][y] = 9
@@ -60,15 +55,25 @@ const revealEmpty = (x, y) => {
 
 const fillGrid = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#dadada';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
             const x = i * resolution;
             const y = j * resolution;
             ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(x, y, resolution, resolution);
-            ctx.fillStyle = '#aaaddd';
-            ctx.fillRect(x, y, resolution, resolution);
+
+            // Draw vertical line
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+
+            // Draw horizontal line
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
 
         }
     }
@@ -101,17 +106,15 @@ const gameOver = () => {
             const y = j * resolution;
             if (mainGrid[i][j] === 10) {
                 drawMine(x, y);
-                ctx.strokeStyle = 'black';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(x, y, resolution, resolution);
-                ctx.fillStyle = 'red'; // Use any grey color of your choice
+                ctx.fillStyle = 'red';
                 ctx.fillRect(x, y, resolution, resolution);
-
+                ctx.strokeStyle = 'black';
+                ctx.strokeRect(x, y, resolution, resolution);
             }
-            ctx.strokeStyle = 'black';
-            ctx.strokeRect(x, y, resolution, resolution);
+
         }
     }
+
 
 }
 
@@ -170,8 +173,6 @@ drawNumber = (num, posx, posy) => {
     // Set font and text properties
     const fontSize = 50;
     ctx.font = `900 ${fontSize}px Arial`;
-
-
 
     switch (num) {
         case 1:
