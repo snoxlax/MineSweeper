@@ -2,25 +2,45 @@ const restartButton = document.getElementById('RestartButton');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const resolution = 100;
-canvas.width = 1600;
+canvas.width = 1500;
 canvas.height = 3000;
 const cols = canvas.width / resolution;
 const rows = canvas.height / resolution;
-const mines = 88;
+const mines = 80;
+let numbers = (cols * rows) - mines;
+let trys = 0;
+let win = false;
+let lose = false;
 
 // Create 2D array
 let mainGrid = Array(cols).fill().map(() => Array(rows).fill(0));
 
-restartButton.addEventListener('click', function () {
+
+const startGame = () => {
     mainGrid = Array(cols).fill().map(() => Array(rows).fill(0));
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#dadada';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     creatMineArray(rows, cols)
     updateGrid()
-    fillGrid()
+    drawGrid()
+    drawGrid()
+    restartButton.innerText = "Restart"
+    trys = 0
+    win = false;
+    lose = false;
+}
+
+restartButton.addEventListener('click', function () {
+    startGame()
 });
 
 
 const mouseClick = (event) => {
+
+    if (win || lose) {
+        return;
+    }
 
     const rect = canvas.getBoundingClientRect()
     const scaleX = canvas.width / rect.width; // Scale to match the canvas size
@@ -40,42 +60,25 @@ const mouseClick = (event) => {
 canvas.addEventListener('click', mouseClick);
 
 
-const revealEmpty = (x, y) => {
-    mainGrid[x][y] = 9
-    for (let i = -1; i < 2; i++) {
-        for (let j = -1; j < 2; j++) {
-            let col = x + i;
-            let row = y + j;
-            if (!(col < 0 || row < 0 || col >= cols || row >= rows)) {
-                drawRect(col, row)
-            }
-        }
-    }
-}
 
-const fillGrid = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#dadada';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+const drawGrid = () => {
+    ctx.strokeStyle = 'black';
     for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-            const x = i * resolution;
-            const y = j * resolution;
-            ctx.strokeStyle = 'black';
+        // Draw vertical line
+        const x = i * resolution;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
 
-            // Draw vertical line
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvas.height);
-            ctx.stroke();
-
-            // Draw horizontal line
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
-
-        }
+    for (let j = 0; j < rows; j++) {
+        // Draw horizontal line
+        const y = j * resolution;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
     }
 }
 
@@ -87,19 +90,36 @@ const drawRect = (x, y) => {
             gameOver();
             break;
         case 0:
+            mainGrid[x][y] = 9
             drawEmptyRect(x * resolution, y * resolution);
             revealEmpty(x, y);
+            trys++
+            console.log(`the numbers are ${numbers} and the trys are  ${trys}`);
             break;
         case 9:
             console.log("Do nothing");
             break;
         default:
+            mainGrid[x][y] = 9
             drawNumber(num, x * resolution, y * resolution);
+            trys++
+            console.log(`the numbers are ${numbers} and the trys are  ${trys}`);
+
     }
 
+    if (trys === numbers) {
+        winGame()
+    }
+}
+
+const winGame = () => {
+    win = true
+    restartButton.innerText = "You Win"
 }
 
 const gameOver = () => {
+    lose = true;
+    restartButton.innerText = "Game Over"
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
             const x = i * resolution;
@@ -111,18 +131,10 @@ const gameOver = () => {
                 ctx.strokeStyle = 'black';
                 ctx.strokeRect(x, y, resolution, resolution);
             }
-
         }
     }
-
-
 }
 
-drawEmptyRect = (posx, posy) => {
-    ctx.clearRect(posx, posy, resolution, resolution);
-    ctx.strokeStyle = 'black';
-    ctx.strokeRect(posx, posy, resolution, resolution);
-}
 
 const creatMineArray = (rows, cols) => {
     let mcount = mines
@@ -158,8 +170,10 @@ const increaseNeighbors = (grid, x, y) => {
             let col = (i + x);
             let row = (j + y);
             if (!(col < 0 || row < 0 || col >= cols || row >= rows)) {
-                if (grid[col][row] !== 10)
+                if (grid[col][row] !== 10) {
                     grid[col][row]++
+                }
+
             }
         }
     }
@@ -203,6 +217,26 @@ drawNumber = (num, posx, posy) => {
     }
     // Draw the number on the canvas
     ctx.fillText(num.toString(), posx + 35, posy + 65);
+    drawGrid();
+}
+
+const revealEmpty = (x, y) => {
+    for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
+            let col = x + i;
+            let row = y + j;
+            if (!(col < 0 || row < 0 || col >= cols || row >= rows)) {
+                drawRect(col, row)
+            }
+        }
+    }
+}
+
+
+drawEmptyRect = (posx, posy) => {
+    ctx.clearRect(posx, posy, resolution, resolution);
+    ctx.strokeStyle = 'black';
+    ctx.strokeRect(posx, posy, resolution, resolution);
 }
 
 drawMine = (posx, posy) => {
@@ -246,9 +280,5 @@ const revealGrid = () => {
 
 
 window.onload = function () {
-
-    creatMineArray(rows, cols)
-    fillGrid()
-    updateGrid()
-    //revealGrid()
+    startGame()
 };
