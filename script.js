@@ -2,11 +2,11 @@ const restartButton = document.getElementById('RestartButton');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const resolution = 100;
-canvas.width = 1500;
-canvas.height = 2000;
+canvas.width = 1600;
+canvas.height = 3000;
 const cols = canvas.width / resolution;
 const rows = canvas.height / resolution;
-const mines = 50;
+const mines = 88;
 
 // // Create 2D array
 let mainGrid = Array(cols).fill().map(() => Array(rows).fill(0));
@@ -122,12 +122,16 @@ drawEmptyRect = (posx, posy) => {
 }
 
 const creatMineArray = (rows, cols) => {
-    for (let i = 0; i < mines; i++) {
+    let mcount = mines
+    while (mcount) {
         let x = Math.floor(Math.random() * (cols));
         let y = Math.floor(Math.random() * (rows));
         console.log(x, y);
-        if (mainGrid[x][y] != 10)
+        if (mainGrid[x][y] != 10) {
             mainGrid[x][y] = 10;
+            mcount--;
+        }
+
     }
     console.log("Mines added");
 };
@@ -165,9 +169,37 @@ drawNumber = (num, posx, posy) => {
     ctx.strokeRect(posx, posy, resolution, resolution);
     // Set font and text properties
     const fontSize = 50;
-    ctx.font = `${fontSize}px Arial`;
-    ctx.fillStyle = 'blue';
+    ctx.font = `900 ${fontSize}px Arial`;
 
+
+
+    switch (num) {
+        case 1:
+            ctx.fillStyle = 'blue';
+            break;
+        case 2:
+            ctx.fillStyle = 'green';
+            break;
+        case 3:
+            ctx.fillStyle = 'red';
+            break;
+        case 4:
+            ctx.fillStyle = 'darkblue';
+            break;
+        case 5:
+            ctx.fillStyle = 'cyan';
+            break;
+        case 6:
+            ctx.fillStyle = 'brown';
+            break;
+        case 7:
+            ctx.fillStyle = 'black';
+            break;
+        case 8:
+            ctx.fillStyle = 'purple';
+            break;
+
+    }
     // Draw the number on the canvas
     ctx.fillText(num.toString(), posx + 35, posy + 65);
 }
